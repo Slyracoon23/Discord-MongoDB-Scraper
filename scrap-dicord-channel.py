@@ -1,4 +1,4 @@
-from re import S
+import os
 import requests
 import time
 
@@ -25,7 +25,7 @@ class DiscordScraper:
 
 
 class Mongo:
-    def __init__(self, client_uri="mongodb+srv://dbUser:AXfdXe5Sy2cX32q@discord-crypto.clfxu.mongodb.net", db="Crypto-Currency-Discord", col="General-Chat"):
+    def __init__(self, client_uri, db="Crypto-Currency-Discord", col="General-Chat"):
         self.client_uri = client_uri
         self.myclient = self.createClient()
         self.mydb = self.myclient[db]
@@ -54,12 +54,16 @@ if __name__ == '__main__':
 
     # Variables
     channel_id = "848464764890775565"
-    auth_token = 'NDI3NTQyODg1ODQ0NjQ3OTQ3.YS2nmQ.8C5lnmOXRC82_gPMGoZjGHkyTN0'
+    auth_token = os.environ['API_DISCORD_TOKEN']
     time_per_update = 10.0 # sec
+
+    mongo_password = os.environ['MONGODB_PASSWORD']
+    mongo_uri = f"mongodb+srv://dbUser:{mongo_password}@discord-crypto.clfxu.mongodb.net"
  
     # instances
     scraper = DiscordScraper(channel_id,auth_token)
-    mong = Mongo()
+    
+    mong = Mongo(mongo_uri)
 
     # Method calls
     starttime = time.time()
