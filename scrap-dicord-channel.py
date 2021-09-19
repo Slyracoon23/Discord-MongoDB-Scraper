@@ -41,8 +41,7 @@ class Mongo:
         return myclient
 
     def updateDB(self, data):
-        print(f"amount of Posts in Data: {len(data['messages'])}")
-        for post in data['messages']:
+        for post in reversed(data['messages']): # Reversed because first element is newest not oldest
             result = self.mycol.update_one(post[0],{"$set":post[0]},upsert=True)
 
         return
@@ -56,7 +55,7 @@ if __name__ == '__main__':
     # Variables
     channel_id = "848464764890775565"
     auth_token = 'NDI3NTQyODg1ODQ0NjQ3OTQ3.YS2nmQ.8C5lnmOXRC82_gPMGoZjGHkyTN0'
-    time_per_update = 25.0 # sec
+    time_per_update = 10.0 # sec
  
     # instances
     scraper = DiscordScraper(channel_id,auth_token)
