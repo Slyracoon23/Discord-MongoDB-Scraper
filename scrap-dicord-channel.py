@@ -1,7 +1,9 @@
+from re import S
 import requests
+import time
 
 import pymongo
-from pymongo.errors import AutoReconnect, ConnectionFailure
+from pymongo.errors import AutoReconnect, ConnectionFailure, ExecutionTimeout
 
 class DiscordScraper:
     def __init__(self, channel_id, auth_token):
@@ -15,7 +17,10 @@ class DiscordScraper:
         API Call only recieves ~25 of most recent messages
         '''
         response = requests.get( self.url, headers=self.headers)
-        assert response.status_code == 200
+        if response.status_code != 200:
+            print(f"\nStatus Code: {response.status_code}")
+            print(response.text)
+            raise
         return response.json()
 
 
@@ -36,6 +41,7 @@ class Mongo:
         return myclient
 
     def updateDB(self, data):
+        print(f"amount of Posts in Data: {len(data['messages'])}")
         for post in data['messages']:
             result = self.mycol.update_one(post[0],{"$set":post[0]},upsert=True)
 
@@ -50,14 +56,18 @@ if __name__ == '__main__':
     # Variables
     channel_id = "848464764890775565"
     auth_token = 'NDI3NTQyODg1ODQ0NjQ3OTQ3.YS2nmQ.8C5lnmOXRC82_gPMGoZjGHkyTN0'
-
-
+    time_per_update = 25.0 # sec
+ 
     # instances
     scraper = DiscordScraper(channel_id,auth_token)
-
-    data = scraper.get_messages()
-
     mong = Mongo()
 
-    mong.updateDB(data)
+    # Method calls
+    starttime = time.time()
+    while True:
+        data = scraper.get_messages()
+        mong.updateDB(data)
+        time.sleep(time_per_update - ((time.time() - starttime) % time_per_update))
+
+
 
