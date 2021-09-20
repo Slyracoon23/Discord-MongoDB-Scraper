@@ -10,7 +10,7 @@ class DiscordScraper:
         self.channel_id = channel_id
         self.auth_token = auth_token
         self.url = "https://discord.com/api/v8/channels/{}/messages/search".format(channel_id)
-        self.headers = {'Authorization': auth_token}
+        self.headers = {'Authorization': auth_token ,'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:20.0) Gecko/20100101 Firefox/20.0'}
 
     def get_messages(self):
         '''
@@ -20,7 +20,9 @@ class DiscordScraper:
         if response.status_code != 200:
             print(f"\nStatus Code: {response.status_code}")
             print(response.text)
-            raise
+            raise 
+
+            
         return response.json()
 
 
@@ -58,7 +60,7 @@ if __name__ == '__main__':
     time_per_update = 10.0 # sec
 
     mongo_password = os.environ['MONGODB_PASSWORD']
-    mongo_uri = f"mongodb+srv://dbUser:{mongo_password}@discord-crypto.clfxu.mongodb.net"
+    mongo_uri = f"mongodb+srv://scraper:{mongo_password}@discord-crypto.clfxu.mongodb.net"
  
     # instances
     scraper = DiscordScraper(channel_id,auth_token)
